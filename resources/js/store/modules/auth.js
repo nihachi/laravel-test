@@ -49,6 +49,7 @@ export default {
             state.authError = payload;
         },
         LOGOUT(state) {
+            console.log(state);
             state.isLoggedin = false;
             state.currentUser = null;
 

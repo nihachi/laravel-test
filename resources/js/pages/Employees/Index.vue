@@ -1,133 +1,68 @@
 <template>
-    <div class="main-wrapper">
-        <div class="container">
-            <a
-                href="javascript:;"
-                class="btn btn-label btn-label-brand btn-sm btn-bold"
-                @click.prevent="handleLogout"
-                >Logout</a
-            >
-            <h3 class="text-center">Employees</h3>
+    <div class="main-wrapper employees-wrapper">
+        <div class="container mt-5">
+            <h1 class="text-left">Employees</h1>
             <br />
             <a
                 href="javascript:;"
-                class="btn btn-primary mb-3"
+                class="btn btn-primary mb-3 float-right"
                 @click.prevent="hanldeCreate()"
                 >Add Employee</a
             >
-            <table class="table table-bordered d-none">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Name</th>
-                        <th>Email</th>
-                        <th>Company</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr v-for="employee in employees" :key="employee.id">
-                        <td>{{ employee.id }}</td>
-                        <td>
-                            {{ employee.first_name + " " + employee.last_name }}
-                        </td>
-                        <td>{{ employee.email }}</td>
-                        <td>{{ employee.company_id }}</td>
-                        <td>
-                            <div class="btn-group" role="group">
-                                <router-link
-                                    :to="{
-                                        path: `employees/edit/${employee.id}`,
-                                        params: { id: employee.id }
-                                    }"
-                                    class="btn btn-primary"
-                                    >Edit
-                                </router-link>
-                                <button
-                                    class="btn btn-danger"
-                                    @click="handleDelete(employee.id)"
-                                >
-                                    Delete
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-            <vuetable
-                ref="vuetable"
+            <b-table
+                hover
                 :fields="fields"
-                :api-mode="false"
-                :data="employees"
-                :per-page="10"
-                @vuetable:pagination-data="onPaginationData"
-                @vuetable:loading="onLoading"
-                @vuetable:loaded="onLoaded"
+                :items="employees"
+                :current-page="currentPage"
+                :per-page="perPage"
+                :filter="filter"
             >
-                <template slot="actions" slot-scope="props">
-                    <div class="table-button-container">
-                        <button
-                            class="small ui button"
-                            @click="editRow(props.rowData)"
-                        >
-                            <i class="fa fa-pencil"></i>
-                        </button>
-                        <button
-                            class="small ui button"
-                            @click="deleteRow(props.rowData)"
-                        >
-                            <i class="fa fa-trash"></i>
-                        </button>
-                    </div>
+                <template v-slot:cell(actions)="{ item }">
+                    <b-btn @click="handleEdit(item)">
+                        Edit
+                    </b-btn>
+                    <b-btn @click="handleDelete(item)">
+                        Delete
+                    </b-btn>
                 </template>
-            </vuetable>
-            <vuetable-pagination
-                ref="pagination"
-                @vuetable-pagination:change-page="onChangePage"
-            ></vuetable-pagination>
+            </b-table>
+            <b-pagination
+                size="md"
+                :total-rows="this.employees.length"
+                :per-page="perPage"
+                v-model="currentPage"
+            />
         </div>
     </div>
 </template>
 <script>
 import { logout } from "../../services/auth";
-import Vuetable from "vuetable-2";
-import VuetablePagination from "vuetable-2/src/components/VuetablePagination";
 export default {
     name: "Employee",
-    components: {
-        Vuetable,
-        VuetablePagination
-    },
     data() {
         return {
             employees: [],
             companies: [],
             fields: [
+                { key: "id", sortable: true },
+                { key: "first_name", label: "First Name" },
+                { key: "last_name", label: "Last Name" },
                 {
-                    name: "first_name",
-                    title: "First Name"
-                },
-                {
-                    name: "last_name",
-                    title: "Last Name"
-                },
-                {
-                    name: "email",
-                    title: "Email"
-                },
-                {
-                    name: "company_id",
-                    title: "Company",
-                    formatter(value) {
-                        // var get_company_name = companies.filter(
-                        //     x => x.id === value
-                        // );
-                        console.log(this.companies);
-                        return value;
+                    key: "company_id",
+                    label: "Company",
+                    formatter: data => {
+                        const name = this.companies.filter(x => x.id === data);
+                        if (!name[0]) return;
+                        return name[0].name;
                     }
                 },
-                "actions"
-            ]
+                { key: "email", label: "Email" },
+                { key: "phone", label: "Phone" },
+                { key: "actions", label: "" }
+            ],
+            currentPage: 1,
+            perPage: 10,
+            filter: null
         };
     },
     mounted() {
@@ -149,12 +84,14 @@ export default {
         async fetchCompany() {
             await this.$http.get("/api/companies").then(response => {
                 this.companies = response.data;
-                console.log(this.companies);
             });
         },
-        handleDelete(id) {
-            this.$http.delete(`api/employees/${id}`).then(response => {
-                let i = this.employees.map(item => item.id).indexOf(id); // find index of your object
+        handleEdit(row) {
+            this.$router.push(`/employees/edit/${row.id}`);
+        },
+        handleDelete(row) {
+            this.$http.delete(`api/employees/${row.id}`).then(response => {
+                let i = this.employees.map(item => item.id).indexOf(row.id); // find index of your object
                 this.employees.splice(i, 1);
             });
         },
@@ -168,24 +105,6 @@ export default {
         },
         hanldeCreate() {
             this.$router.push("/employees/new");
-        },
-        onPaginationData(paginationData) {
-            this.$refs.pagination.setPaginationData(paginationData);
-        },
-        onChangePage(page) {
-            this.$refs.vuetable.changePage(page);
-        },
-        editRow(rowData) {
-            alert("You clicked edit on" + JSON.stringify(rowData));
-        },
-        deleteRow(rowData) {
-            alert("You clicked delete on" + JSON.stringify(rowData));
-        },
-        onLoading() {
-            console.log("loading... show your spinner here");
-        },
-        onLoaded() {
-            console.log("loaded! .. hide your spinner here");
         }
     }
 };

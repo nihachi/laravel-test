@@ -1,7 +1,7 @@
 export function login(credentials) {
     return new Promise((resolve, reject) => {
         axios
-            .post("api/auth/login", credentials)
+            .post("/api/auth/login", credentials)
             .then(response => {
                 resolve(response.data);
             })
@@ -24,7 +24,7 @@ export function getLocalUser() {
 export function logout() {
     return new Promise((resolve, reject) => {
         axios
-            .post("api/auth/logout")
+            .post("/api/auth/logout")
             .then(response => resolve(response))
             .catch(error => reject(error));
     });

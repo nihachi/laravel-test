@@ -77,7 +77,7 @@ class EmployeeController extends Controller
         if ( $employee->update($request->all()) ) {
             $response = [ 'status' => 'success' ];
         } else {
-            $response = [ 'status' => 'error', 'message' => $validatedData ];
+            $response = [ 'status' => 'error'];
         }
 
         return response()->json($response, 200);

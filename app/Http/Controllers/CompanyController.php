@@ -19,16 +19,6 @@ class CompanyController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
      * Store a newly created resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
@@ -36,7 +26,18 @@ class CompanyController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'name'   => 'required|string|max:255',
+            'email'  => 'required|unique:companies,email',
+        ]);
+
+        if (Company::create($request->all()) ) {
+            $response = [ 'status' => 'success' ];
+        } else {
+            $response = [ 'status' => 'error' ];
+        }
+
+        return response()->json($response, 200);
     }
 
     /**
@@ -45,20 +46,10 @@ class CompanyController extends Controller
      * @param  \App\Company  $company
      * @return \Illuminate\Http\Response
      */
-    public function show(Company $company)
+    public function show($id)
     {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Company  $company
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Company $company)
-    {
-        //
+        $company = Company::find($id);
+        return response()->json($company, 200);
     }
 
     /**
@@ -68,9 +59,26 @@ class CompanyController extends Controller
      * @param  \App\Company  $company
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Company $company)
+    public function update(Request $request, $id)
     {
-        //
+        $validatedData = $request->validate([
+            'name'  => 'required|string|max:255',
+            'email' => 'required|email',
+        ]);
+
+        $company = Company::find($id);
+        
+        if (!$company) {
+            return response()->json([ 'status' => 'error' ], 404);
+        }
+
+        if ( $company->update($request->all()) ) {
+            $response = [ 'status' => 'success' ];
+        } else {
+            $response = [ 'status' => 'error', 'data' => $request ];
+        }
+
+        return response()->json($response, 200);
     }
 
     /**
@@ -81,6 +89,15 @@ class CompanyController extends Controller
      */
     public function destroy(Company $company)
     {
-        //
+        $company->delete();
+        return response()->json([ 'status' => 'success' ], 200);
+    }
+
+    public function upload(Request $request){
+        if ($request->has('image')){
+            $pathToFile = $request->file('image')->store('images', 'public');
+    
+            return $pathToFile;
+        }
     }
 }

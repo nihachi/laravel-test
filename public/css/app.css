@@ -10899,3 +10899,15 @@ a.text-dark:focus {
   }
 }
 
+.employees-wrapper .b-table tbody td[aria-colindex="7"] {
+  text-align: right;
+}
+
+.companies-wrapper .b-table tbody td {
+  vertical-align: middle;
+}
+
+.companies-wrapper .b-table tbody td[aria-colindex="5"] {
+  text-align: right;
+}
+

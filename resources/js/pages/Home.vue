@@ -1,19 +1,18 @@
 <template>
     <div class="main-wrapper">
-        <header>
-            <div class="container"></div>
-        </header>
-        <!-- Header Component here -->
+        <Header />
 
         <transition name="fade" mode="out-in">
             <router-view :key="$router.fullPath"></router-view>
         </transition>
-
-        <!-- Footer Component here -->
     </div>
 </template>
 <script>
+import Header from "../components/Header";
 export default {
-    name: "page-home"
+    name: "page-home",
+    components: {
+        Header
+    }
 };
 </script>

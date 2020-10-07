@@ -8,6 +8,7 @@ require("./bootstrap");
 import Vue from "vue";
 import VueRouter from "vue-router";
 import Vuex from "vuex";
+import { BootstrapVue, IconsPlugin } from "bootstrap-vue";
 import { routes } from "./routes";
 import StoreData from "./store/index";
 import { initialize } from "./helpers/general";
@@ -20,6 +21,11 @@ Vue.component("v-select", vSelect);
 
 Vue.use(VueRouter);
 Vue.use(Vuex);
+
+// Install BootstrapVue
+Vue.use(BootstrapVue);
+// Optionally install the BootstrapVue icon components plugin
+Vue.use(IconsPlugin);
 
 Vue.prototype.$http = window.axios;
 
