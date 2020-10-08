@@ -45,6 +45,7 @@
                         <div class="form-group">
                             <label>Company</label>
                             <v-select
+                                id="vselect"
                                 label="name"
                                 :options="companies"
                                 :value="company_name"

@@ -10925,3 +10925,7 @@ div[data-notify=container] span[data-notify=title] {
   background: #fff;
 }
 
+.vs__clear {
+  display: none;
+}
+

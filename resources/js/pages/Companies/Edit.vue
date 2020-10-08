@@ -34,7 +34,7 @@
                         <div class="form-group">
                             <label>Email</label>
                             <input
-                                type="text"
+                                type="email"
                                 class="form-control"
                                 v-model="company.email"
                             />

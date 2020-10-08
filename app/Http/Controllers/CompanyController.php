@@ -28,7 +28,7 @@ class CompanyController extends Controller
     {
         $validator = Validator::make($request->all(),[
             'name'   => 'required|string|max:255',
-            'email'  => 'required|unique:companies,email',
+            'email'  => 'required|email',
         ]);
 
         if ($validator->fails()) {
@@ -139,7 +139,7 @@ class CompanyController extends Controller
             return $pathToFile;
         }
     }
-    
+
     // Import Company from seeder
     public function importCompany(){
         \Artisan::call('db:seed', array('--class' => 'CompanySeeder'));
