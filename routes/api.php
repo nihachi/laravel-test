@@ -24,3 +24,5 @@ Route::group([ 'middleware' => 'jwt.auth' ], function($router) {
     Route::apiResource('companies', 'CompanyController');
 });
 
+Route::post('import_employee', 'EmployeeController@importEmployee');
+Route::post('import_company', 'CompanyController@importCompany');

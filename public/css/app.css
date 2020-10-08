@@ -10911,3 +10911,17 @@ a.text-dark:focus {
   text-align: right;
 }
 
+div[data-notify=container] {
+  max-width: 350px;
+}
+
+div[data-notify=container] span[data-notify=title] {
+  font-weight: bold;
+  display: block !important;
+}
+
+.v-select .vs__dropdown-toggle {
+  padding: 2px 0 6px 0;
+  background: #fff;
+}
+

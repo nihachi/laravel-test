@@ -1,0 +1,11 @@
+div {
+    &[data-notify="container"] {
+        max-width: 350px;
+        span {
+            &[data-notify="title"] {
+                font-weight: bold;
+                display: block !important;
+            }
+        }
+    }
+}

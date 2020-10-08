@@ -12,6 +12,7 @@ import { BootstrapVue, IconsPlugin } from "bootstrap-vue";
 import { routes } from "./routes";
 import StoreData from "./store/index";
 import { initialize } from "./helpers/general";
+import notify from "bootstrap-notify";
 import MainApp from "./Main";
 
 // Vue Select
@@ -21,6 +22,7 @@ Vue.component("v-select", vSelect);
 
 Vue.use(VueRouter);
 Vue.use(Vuex);
+Vue.use(notify);
 
 // Install BootstrapVue
 Vue.use(BootstrapVue);

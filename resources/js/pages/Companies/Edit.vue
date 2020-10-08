@@ -4,9 +4,17 @@
             <h3 class="text-center">Edit Company</h3>
             <div class="row justify-content-center">
                 <div class="col-md-6">
+                    <p v-if="errors.length" class="mt-3">
+                        <b>Please correct the following error(s):</b>
+                        <ul>
+                        <li v-for="error in errors" :key="error.id">{{ error }}</li>
+                        </ul>
+                    </p>
                     <form
+                        id="update_company_form"
                         enctype="multipart/form-data"
                         @submit.prevent="updateCompany"
+                        novalidate="novalidate"
                     >
                         <div
                             v-if="errMessage"
@@ -32,8 +40,15 @@
                             />
                         </div>
                         <div class="form-group">
-                            <label>Company Logo</label>
-                            <input type="file" name="logo" />
+                            <input
+                                id="customFile"
+                                type="file"
+                                name="photo"
+                                @change="onFileChange"
+                            />
+                            <label for="customFile">{{
+                                this.company.logo
+                            }}</label>
                         </div>
                         <button type="submit" class="btn btn-primary">
                             Update Company
@@ -46,13 +61,6 @@
                             Back
                         </button>
                     </form>
-                    <!-- <form
-                        enctype="multipart/form-data"
-                        @submit.prevent="handleTestSubmit"
-                    >
-                        <input type="file" @change="onFileChange" />
-                        <button type="submit">submit</button>
-                    </form> -->
                 </div>
             </div>
         </div>
@@ -60,6 +68,8 @@
 </template>
 
 <script>
+import _ from "lodash";
+import { validateForm, notify } from "../../helpers/general";
 export default {
     data() {
         return {
@@ -69,7 +79,9 @@ export default {
                 logo: ""
             },
             errMessage: null,
-            image: ""
+            photo: "",
+            errors: [],
+            notify: null
         };
     },
     mounted() {
@@ -85,13 +97,43 @@ export default {
                 });
         },
         async updateCompany() {
+            this.errors = [];
+            const data = this.gatherFormData();
             await this.$http
-                .put(`/api/companies/${this.$route.params.id}`, this.company)
+                .post(`/api/companies/${this.$route.params.id}`, data)
                 .then(response => {
-                    this.$router.push("/companies");
+                    if (response.data.status === "success") {
+                        const type = "success";
+                        const content = {
+                            title: "Company has been updated",
+                            message: `${this.company.name}'s info has been updated`
+                        };
+                        notify(type, content);
+                        this.$router.push("/companies");
+                    } else {
+                        if (!this.company.name) {
+                            this.errors.push(response.data.errors.name[0]);
+                        }
+                        if (!this.company.email) {
+                            this.errors.push(response.data.errors.email[0]);
+                        } else if (!this.validEmail(this.company.email)) {
+                            this.errors.push("Valid email required.");
+                        }
+                        const type = "danger";
+                        const content = {
+                            title: "Something went wrong",
+                            message: `Update Failed.`
+                        };
+                        notify(type, content);
+                    }
                 })
                 .catch(error => {
-                    console.log(error);
+                    const type = "danger";
+                    const content = {
+                        title: "Something went wrong",
+                        message: `Update Failed.`
+                    };
+                    notify(type, content);
                 });
         },
         handleBack() {
@@ -104,12 +146,21 @@ export default {
         },
         onFileChange(e) {
             console.log(e.target.files[0]);
-            this.company.log = e.target.files[0];
+            this.photo = e.target.files[0];
         },
-        handleTestSubmit() {
+        gatherFormData() {
             const formData = new FormData();
-            formData.set("image", this.image);
-            axios.post("/upload", formData);
+            formData.append("photo", this.photo);
+
+            _.each(this.company, (value, key) => {
+                formData.set(key, value);
+            });
+            formData.append("_method", "PUT");
+            return formData;
+        },
+        validEmail: function(email) {
+            var re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+            return re.test(email);
         }
     }
 };

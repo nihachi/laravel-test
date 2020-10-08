@@ -5,6 +5,12 @@
             <br />
             <a
                 href="javascript:;"
+                class="btn btn-primary mb-3 float-left"
+                @click.prevent="importData()"
+                >Import Company</a
+            >
+            <a
+                href="javascript:;"
                 class="btn btn-primary mb-3 float-right"
                 @click.prevent="hanldeCreate()"
                 >Add Company</a
@@ -44,6 +50,7 @@
     </div>
 </template>
 <script>
+import { notify } from "../../helpers/general";
 export default {
     name: "Employee",
     data() {
@@ -87,6 +94,20 @@ export default {
         },
         hanldeCreate() {
             this.$router.push("/companies/new");
+        },
+        async importData() {
+            await this.$http.post("/api/import_company").then(response => {
+                const type = "success";
+                const content = {
+                    title: "Import Company",
+                    message: `Company is successfully imported.`
+                };
+                notify(type, content);
+                if (response.data.status == "success") {
+                    console.log("refresh here");
+                    location.reload();
+                }
+            });
         }
     }
 };

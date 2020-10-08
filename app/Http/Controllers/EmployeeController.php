@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Employee;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class EmployeeController extends Controller
 {
@@ -26,11 +27,15 @@ class EmployeeController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
+        $validator = Validator::make($request->all(),[
             'first_name' => 'required|string|max:255',
             'last_name'  => 'required|string|max:255',
             'email'      => 'required|unique:employees,email',
         ]);
+
+        if ($validator->fails()) {
+            return response()->json([ 'status' => 'error', 'errors' => $validator->errors()]);
+        }
 
         if (Employee::create($request->all()) ) {
             $response = [ 'status' => 'success' ];
@@ -62,11 +67,15 @@ class EmployeeController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $validatedData = $request->validate([
+        $validator = Validator::make($request->all(),[
             'first_name' => 'required|string|max:255',
             'last_name'  => 'required|string|max:255',
             'email'      => 'required|email',
         ]);
+
+        if ($validator->fails()) {
+            return response()->json([ 'status' => 'error', 'errors' => $validator->errors()]);
+        }
 
         $employee = Employee::find($id);
 
@@ -92,6 +101,12 @@ class EmployeeController extends Controller
     public function destroy(Employee $employee)
     {
         $employee->delete();
+        return response()->json([ 'status' => 'success' ], 200);
+    }
+
+    // Import Employees from seeder
+    public function importEmployee(){
+        \Artisan::call('db:seed', array('--class' => 'EmployeeSeeder'));
         return response()->json([ 'status' => 'success' ], 200);
     }
 }
