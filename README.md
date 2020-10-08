@@ -1,5 +1,5 @@
 
-
+# Getting started
 ## Installation
 
 Clone the repository
@@ -8,7 +8,7 @@ Clone the repository
 
 Switch to the repo folder
 
-    cd laravel-realworld-example-app
+    cd laravel-test
 
 Install all the dependencies using composer
 
@@ -35,3 +35,17 @@ Start the local development server
     php artisan serve
 
 You can now access the server at http://localhost:8000
+
+
+## Frontend
+Install all the dependencies using npm
+
+    npm install
+    
+Start the frontend view
+
+    npm run watch
+
+To create a production build
+
+    npm run build
